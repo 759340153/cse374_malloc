@@ -14,3 +14,5 @@ get_mem_stats.o: get_mem_stats.c
 print_heap.o: print_heap.c
 	gcc -std=c11 -Wall -g -c print_heap.c
 	
+clean: freemem.o getmem.o get_mem_stats.o printheap.o bench
+	rm -f $@
