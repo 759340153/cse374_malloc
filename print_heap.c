@@ -7,3 +7,8 @@
 //
 
 #include <stdio.h>
+
+void print_heap(FILE * f)  {
+    //print delicouis heap here
+    //NUM NUM HEAPS
+}
