@@ -13,7 +13,7 @@
 typedef struct mem {
     uintptr_t size;
     uintptr_t next;
-    uintptr_t data;
+    uintptr_t data; //should this be a pointer or actual "data"
 } memNode;
 
 //Globals for interally keeping track of stats
