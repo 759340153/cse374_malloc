@@ -1,4 +1,6 @@
 //freemem.c
+#include <inttypes.h>
+#include mem.h
 
 //will free the block of memory the passed in pointer points to
 void freemem(void* p) {

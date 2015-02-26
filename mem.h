@@ -1,5 +1,8 @@
 //mem.h
 //declares all the functions that can be used externally
+#include <inttypes.h>
+#ifndef test
+#define test
 
 // gets a block of memory of size size
 void* getmem(uinptr_t size); 
@@ -13,3 +16,4 @@ void get_mem_stats(uintptr_t* total_size, uintptr_t* total_free, uintptr_t* n_fr
 
 //prints a list of all the blocks on the free list into the file provided
 void print_heap(FILE * f);
+#endif
