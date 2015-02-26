@@ -7,6 +7,9 @@
 //
 
 #include <stdio.h>
+#include "mem_impl.h"
+
+void print_heap(FILE * f);
 
 void print_heap(FILE * f)  {
     //print delicouis heap here
