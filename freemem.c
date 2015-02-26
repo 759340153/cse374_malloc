@@ -30,4 +30,5 @@ void* findMemorySpot(void* p) {
 	//if free is empty, pass null
 	//goes until the address of one block + the size of that block is < the address of p and address of the next block is > than the address of p
 	//if the end of free is reached, pass the last block in free
+	return NULL;
 }

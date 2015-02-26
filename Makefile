@@ -13,8 +13,5 @@ get_mem_stats.o: get_mem_stats.c
 
 print_heap.o: print_heap.c
 	gcc -std=c11 -Wall -g -c print_heap.c
-	
-git.log: 
-	git log > git.log
 clean:
-	rm -f *.o bench
+	rm -rf *.o bench
