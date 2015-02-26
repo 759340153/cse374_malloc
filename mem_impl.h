@@ -21,4 +21,8 @@ extern int totalFree;
 extern int usedMem;
 extern int freeMem;
 
+//Initial node of free list
+//null to start with
+extern memNode root;
+
 #endif
