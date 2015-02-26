@@ -16,6 +16,5 @@ print_heap.o: print_heap.c
 	
 git.log: 
 	git log > git.log
-
-clean: freemem.o getmem.o get_mem_stats.o printheap.o bench
-	rm -f $@
+clean:
+	rm -f *.o bench
