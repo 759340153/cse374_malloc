@@ -1,11 +1,12 @@
 //mem.h
 //declares all the functions that can be used externally
 #include <inttypes.h>
+#include <stdio.h>
 #ifndef test
 #define test
 
 // gets a block of memory of size size
-void* getmem(uinptr_t size); 
+void* getmem(uintptr_t size); 
 
 //frees the block of memory stored at pointer p
 void freemem(void* p); 
