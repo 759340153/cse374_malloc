@@ -2,6 +2,10 @@
 #include <inttypes.h>
 #include "mem.h"
 
+void freemem(void* p);
+void combineSmallBlocks(void* p, void* prev);
+void* findMemorySpot(void* p);
+
 //will free the block of memory the passed in pointer points to
 void freemem(void* p) {
 	if (!p) {
