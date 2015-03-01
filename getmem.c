@@ -10,6 +10,8 @@
 #include "mem_impl.h"
 #include "mem.h"
 
+extern memNode * root;
+
 #define SPLIT_SIZE 256 //what size we split a block at
 #define LARGE_BLOCK_SIZE 1024 * 16//size of initial block
 //sizes to split into

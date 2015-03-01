@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include "mem.h"
+#include "mem_impl.h"
 #include <unistd.h> //command line parsing
 //small and large block limits
 #define def_ntrial 10000
@@ -15,6 +16,9 @@
 #define def_pctlarge 10
 #define def_small_limit 200
 #define def_large_limit 20000
+
+
+memNode * root = NULL;
 
 //function prototypes
 int getRandom(int size); //reads from urandom for size
