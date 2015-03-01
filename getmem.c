@@ -11,21 +11,30 @@
 #include "mem.h"
 
 #define SPLIT_SIZE 256 //what size we split a block at
-#define LARGE_BLOCK_SIZE 1024 //size of initial block
+#define LARGE_BLOCK_SIZE 1024 * 16//size of initial block
 //sizes to split into
 #define LARGE_BUCKET 128
 #define MED_BUCKET 64
 #define SMALL_BUCKET 32
+#define maxOveragePercent .20
 
 //funtion protos
 memNode * splitBlock(memNode * block, int Splitsize); //split a block into many blocks
-int checkBlockToBig(memNode * block); //check if a block is over SPLIT_SIZE
+//int checkBlockSize(memNode * block, uintptr_t size); //check if a block is over SPLIT_SIZE
 void removeFromFree(memNode * block); //remove a memnode from the freelist
 uintptr_t mallocData(memNode * block); //give memory to a block
+memNode * chooseBlock(memNode * block, uintptr_t size);
 
 //grab at least size amount of mem and return a void pointer to the user
 void* getmem(uintptr_t size) {
-    return NULL;
+    if (root) {
+        mallocData(root);
+    }
+    memNode * choosenBlock = chooseBlock(root, size);
+    return (void *) &choosenBlock->next+1; //should be start of data
+    //if (root->size > maxOveragePercent*size) {
+    //    splitBlock(<#memNode *block#>, <#int splitSize#>)
+    //}
 }
 
 //return
@@ -34,12 +43,22 @@ memNode * splitBlock(memNode * block, int splitSize) {
     return NULL;
 }
 
-int checkBlockToBig (memNode * block) {
-    if (block->size > SPLIT_SIZE) {
-        return 1;
+memNode * chooseBlock(memNode * block, uintptr_t size) {
+    if (block->size < size) { //do we need both? hmmm
+        if (block->size) {
+           return chooseBlock((memNode *) block->next, size);
+        }
+        else {
+            //also need sto account for if getmem is called on an amount
+            //larger than LARGE_BLOCK_SIZE
+            return chooseBlock(mallocData(block), size); //errr might need to link things
+        }
+    }
+    else if (root->size > maxOveragePercent*size) {
+        return splitBlock(block, size);
     }
     else {
-        return 0;
+        return block;
     }
 }
 
@@ -48,6 +67,7 @@ void removeFromFree(memNode * block) {
 }
 
 uintptr_t mallocData(memNode * block) {
-    block->data = (uintptr_t) malloc(block->size); //something like this
-    return block->data ; //or something like that
+    root = malloc(LARGE_BLOCK_SIZE);
+    root->size = LARGE_BLOCK_SIZE-sizeof(root); //should be 16 less
+    return root;
 }
