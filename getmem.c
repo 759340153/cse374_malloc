@@ -26,6 +26,9 @@ uintptr_t mallocData(memNode * block); //give memory to a block
 memNode * chooseBlock(memNode * block, uintptr_t size);
 
 memNode * root;
+int totalFree = 0;
+int usedMem = 0;
+int freeMem = 0;
 
 //grab at least size amount of mem and return a void pointer to the user
 void* getmem(uintptr_t size) {

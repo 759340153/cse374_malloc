@@ -4,6 +4,9 @@
 #include "mem_impl.h"
 
 extern memNode * root;
+extern int totalFree;
+extern int usedMem;
+extern int freeMem;
 
 void freemem(memNode * p);
 void combineSmallBlocks(memNode * p, memNode * prev);

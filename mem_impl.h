@@ -15,9 +15,4 @@ typedef struct mem {
     uintptr_t next;
 } memNode;
 
-//Globals for interally keeping track of stats
-extern int totalFree;
-extern int usedMem;
-extern int freeMem;
-
 #endif
