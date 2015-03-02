@@ -2,6 +2,7 @@
 //declares all the functions that can be used externally
 #include <inttypes.h>
 #include <stdio.h>
+#include "mem_impl.h"
 #ifndef test
 #define test
 
@@ -9,7 +10,7 @@
 void* getmem(uintptr_t size); 
 
 //frees the block of memory stored at pointer p
-void freemem(void* p); 
+void freemem(memNode * p); 
 
 //stores stats about the state of the memory manager in the 3 pointers provided
 //stores total size stored in bytes, total number amount of free storage in bytes, and the number of free blocks 

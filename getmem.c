@@ -10,8 +10,6 @@
 #include "mem_impl.h"
 #include "mem.h"
 
-extern memNode * root;
-
 #define SPLIT_SIZE 256 //what size we split a block at
 #define LARGE_BLOCK_SIZE 1024 * 16//size of initial block
 //sizes to split into
@@ -26,6 +24,8 @@ memNode * splitBlock(memNode * block, int Splitsize); //split a block into many 
 void removeFromFree(memNode * block); //remove a memnode from the freelist
 uintptr_t mallocData(memNode * block); //give memory to a block
 memNode * chooseBlock(memNode * block, uintptr_t size);
+
+memNode * root;
 
 //grab at least size amount of mem and return a void pointer to the user
 void* getmem(uintptr_t size) {

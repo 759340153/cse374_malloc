@@ -17,8 +17,7 @@
 #define def_small_limit 200
 #define def_large_limit 20000
 
-
-memNode * root = NULL;
+extern memNode * root;
 
 //function prototypes
 int getRandom(int size); //reads from urandom for size
@@ -32,6 +31,12 @@ int main(int argc, const char * argv[]) {
     //as well as inc numbe rof allocs
     //delete
     //
+	root=malloc(1024);
+	root->size = 16;
+	printf("%zu\n", sizeof(uintptr_t *));
+	printf("%zu\n", sizeof(*root));
+	printf("%zu\n", root->size);
+	printf("%p  %lu\n", &root, root + (root->size+16) - root);
     printf("Hello, memory!\n");
     return 0;
 }
