@@ -1,4 +1,4 @@
-//
+ //
 //  getmem.c
 //  hw6
 //
@@ -38,15 +38,16 @@ void* getmem(uintptr_t size) {
 //return
 memNode * splitBlock(memNode * block, uintptr_t splitSize) {
     int alignment = splitSize % ALIGN;
-    if(!alignment) {
+    if(alignment) {
         splitSize = splitSize + ALIGN - alignment;
     }
     uintptr_t oldSize = block->size;
     block->size = splitSize;
-    block->next = (uintptr_t) &block+splitSize+sizeof(block);
+    block->next = (uintptr_t) block+splitSize+2; //maybe want a define for fields?
     memNode newBlock;
     newBlock.size = oldSize - splitSize; // set the new size.
-    *(memNode *)(block->next) = newBlock; //lol wat
+    newBlock.next = (uintptr_t) NULL;
+    *(memNode *)(block->next) = newBlock; //lol wat (does this werk?)
     return block; //do we need to return this, or should we figure out a new way
 }
 

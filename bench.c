@@ -31,13 +31,19 @@ int main(int argc, const char * argv[]) {
     //as well as inc numbe rof allocs
     //delete
     //
-	root=malloc(1024);
-	root->size = 16;
-	printf("%zu\n", sizeof(uintptr_t *));
-	printf("%zu\n", sizeof(*root));
-	printf("%zu\n", root->size);
-	printf("%p  %lu\n", &root, root + (root->size+16) - root);
+	//root=malloc(1024);
+	//root->size = 16;
+	//printf("%zu\n", sizeof(uintptr_t *));
+	//printf("%zu\n", sizeof(*root));
+	//printf("%zu\n", root->size);
+	//printf("%p  %lu\n", &root, root + (root->size+16) - root);
     printf("Hello, memory!\n");
+    //temp getmem tests weee
+    char * a = getmem(32);
+    char * b = getmem(14);
+    char * c = getmem(463);
+    char * d = getmem(45);
+    printf("a: %l, b: %l, c: %l, d: %l", sizeof(a), sizeof(b), sizeof(c), sizeof(d));
     return 0;
 }
 
