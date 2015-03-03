@@ -11,20 +11,16 @@
 #include "mem.h"
 
 #define SPLIT_SIZE 256 //what size we split a block at
-#define LARGE_BLOCK_SIZE 1024 * 16//size of initial block
-//sizes to split into
-#define LARGE_BUCKET 128
-#define MED_BUCKET 64
-#define SMALL_BUCKET 32
+#define LARGE_BLOCK_SIZE 1024 * 16 //size of initial block
+#define ALIGN 16
 #define maxOveragePercent .20
 
 //funtion protos
-memNode * splitBlock(memNode * block, int Splitsize); //split a block into many blocks
-//int checkBlockSize(memNode * block, uintptr_t size); //check if a block is over SPLIT_SIZE
+memNode * splitBlock(memNode * block, uintptr_t Splitsize); //split a block into many blocks
 void removeFromFree(memNode * block); //remove a memnode from the freelist
-uintptr_t mallocData(memNode * block); //give memory to a block
+memNode * mallocData(memNode * block); //give memory to a block
 memNode * chooseBlock(memNode * block, uintptr_t size);
-
+//globals
 memNode * root;
 int totalFree = 0;
 int usedMem = 0;
@@ -32,20 +28,26 @@ int freeMem = 0;
 
 //grab at least size amount of mem and return a void pointer to the user
 void* getmem(uintptr_t size) {
-    if (root) {
+    if (!root) {
         mallocData(root);
     }
     memNode * choosenBlock = chooseBlock(root, size);
     return (void *) &choosenBlock->next+1; //should be start of data
-    //if (root->size > maxOveragePercent*size) {
-    //    splitBlock(<#memNode *block#>, <#int splitSize#>)
-    //}
 }
 
 //return
-memNode * splitBlock(memNode * block, int splitSize) {
-    //something splitty.
-    return NULL;
+memNode * splitBlock(memNode * block, uintptr_t splitSize) {
+    int alignment = splitSize % ALIGN;
+    if(!alignment) {
+        splitSize = splitSize + ALIGN - alignment;
+    }
+    uintptr_t oldSize = block->size;
+    block->size = splitSize;
+    block->next = (uintptr_t) &block+splitSize+sizeof(block);
+    memNode newBlock;
+    newBlock.size = oldSize - splitSize; // set the new size.
+    *(memNode *)(block->next) = newBlock; //lol wat
+    return block; //do we need to return this, or should we figure out a new way
 }
 
 memNode * chooseBlock(memNode * block, uintptr_t size) {
@@ -71,7 +73,7 @@ void removeFromFree(memNode * block) {
     //remove a memNode wheee
 }
 
-uintptr_t mallocData(memNode * block) {
+memNode * mallocData(memNode * block) {
     root = malloc(LARGE_BLOCK_SIZE);
     root->size = LARGE_BLOCK_SIZE-sizeof(root); //should be 16 less
     return root;
