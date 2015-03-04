@@ -39,12 +39,24 @@ int main(int argc, const char * argv[]) {
 	//printf("%p  %lu\n", &root, root + (root->size+16) - root);
     printf("Hello, memory!\n");
     //temp getmem tests weee
-    char * a = getmem(32);
-    printf("%lu\n", sizeof(*a));
-    char * b = getmem(14);
+    int * a;
+    //print_heap(stdout);
+    a = (int *) getmem(32);
+    //print_heap(stdout);
+    a[31] = 1;
+    a[32] = 1;
+    printf("%lu, %d\n", sizeof(*a), a[31]);
+    int * b;
+    b = (int *) getmem(14);
+    //print_heap(stdout);
+    //freemem();
     char * c = getmem(463);
+    //print_heap(stdout);
     char * d = getmem(45);
-    printf("a: %lu, b: %lu, c: %lu, d: %lu", sizeof(*a), sizeof(*b), sizeof(*c), sizeof(*d));
+    printf("a: %lu, b: %lu, c: %lu, d: %lu\n", sizeof(*a), sizeof(*b), sizeof(*c), sizeof(*d));
+    //print_heap(stdout);
+    //getmem(3241234124);
+    //print_heap(stdout);
     return 0;
 }
 
