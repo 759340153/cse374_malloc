@@ -56,11 +56,13 @@ int main(int argc, const char * argv[]) {
     printf("a: %lu, b: %lu, c: %lu, d: %lu\n", sizeof(*a), sizeof(*b), sizeof(*c), sizeof(*d));
     print_heap(stdout);
 	printf("new\n");
-	freemem(d);
-	print_heap(stdout);
 	freemem(c);
 	print_heap(stdout);
+	freemem(d);
+	print_heap(stdout);
 	freemem(a);
+	print_heap(stdout);
+	freemem(b);
 	print_heap(stdout);
 	//print_heap(stdout);
     //getmem(3241234124);

@@ -19,7 +19,6 @@ void freemem(void * p) {
 		return;
 	} 
 	memNode* pNode = p - sizeof(memNode);
-	printf("%zu\n", pNode->next);
 	memNode * prev = findMemorySpot(pNode);
 	addToFree(pNode, prev);
 	combineSmallBlocks(pNode, prev);
@@ -27,8 +26,9 @@ void freemem(void * p) {
 
 void combineSmallBlocks(memNode * p, memNode * prev) {
 	if (p->next) {
+		printf("next exists\n");
 		memNode * pNext = (memNode *) p->next;
-		if (p + p->size + sizeof(memNode) - pNext == 0) {
+		if ((long) p + p->size + sizeof(memNode) - (long) pNext == 0) {
 			p->size = p->size + pNext->size + 2*sizeof(memNode);
 			if (pNext->next) {
 				p->next = pNext->next;
@@ -38,7 +38,8 @@ void combineSmallBlocks(memNode * p, memNode * prev) {
 		}
 	}
 	if (prev) {
-		if (prev + prev->size+16 - p == 0) {
+		printf("prev exists\n");
+		if ((long) prev + prev->size+16 - (long) p == 0) {
 			prev->size = prev->size + p->size + 32;
 			if (p->next) {
 				prev->next = p->next;
@@ -77,9 +78,9 @@ void addToFree(memNode * p, memNode * prev) {
 			root = p;
 		}
 	} else if (!prev->next) {
-		prev->next = (uintptr_t) &p;
+		prev->next = (uintptr_t) p;
 	} else {
 		p->next = prev->next;
-		prev->next = (uintptr_t) &p;
+		prev->next = (uintptr_t) p;
 	}
 }
