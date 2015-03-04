@@ -40,10 +40,11 @@ int main(int argc, const char * argv[]) {
     printf("Hello, memory!\n");
     //temp getmem tests weee
     char * a = getmem(32);
+    printf("%lu\n", sizeof(*a));
     char * b = getmem(14);
     char * c = getmem(463);
     char * d = getmem(45);
-    printf("a: %l, b: %l, c: %l, d: %l", sizeof(a), sizeof(b), sizeof(c), sizeof(d));
+    printf("a: %lu, b: %lu, c: %lu, d: %lu", sizeof(*a), sizeof(*b), sizeof(*c), sizeof(*d));
     return 0;
 }
 
