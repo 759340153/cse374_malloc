@@ -8,26 +8,28 @@ extern int totalFree;
 extern int usedMem;
 extern int freeMem;
 
-void freemem(memNode * p);
+void freemem(void * p);
 void combineSmallBlocks(memNode * p, memNode * prev);
 memNode * findMemorySpot(memNode * p);
 void addToFree(memNode * p, memNode * prev);
 
 //will free the block of memory the passed in pointer points to
-void freemem(memNode * p) {
+void freemem(void * p) {
 	if (!p) {
 		return;
 	} 
-	memNode * prev = findMemorySpot(p);
-	addToFree(p, prev);
-	combineSmallBlocks(p, prev);
+	memNode* pNode = p - sizeof(memNode);
+	printf("%zu\n", pNode->next);
+	memNode * prev = findMemorySpot(pNode);
+	addToFree(pNode, prev);
+	combineSmallBlocks(pNode, prev);
 }
 
 void combineSmallBlocks(memNode * p, memNode * prev) {
 	if (p->next) {
 		memNode * pNext = (memNode *) p->next;
-		if (p + p->size+16 - pNext == 0) {
-			p->size = p->size + pNext->size + 32;
+		if (p + p->size + sizeof(memNode) - pNext == 0) {
+			p->size = p->size + pNext->size + 2*sizeof(memNode);
 			if (pNext->next) {
 				p->next = pNext->next;
 			} else {
@@ -68,8 +70,8 @@ memNode * findMemorySpot(memNode * p) {
 
 void addToFree(memNode * p, memNode * prev) {
 	if (!prev) {
-		if (root->next) {
-			p->next = root->next;
+		if (root) {
+			p->next = (uintptr_t) root;
 			root = p;
 		} else {
 			root = p;

@@ -54,7 +54,15 @@ int main(int argc, const char * argv[]) {
     //print_heap(stdout);
     char * d = getmem(45);
     printf("a: %lu, b: %lu, c: %lu, d: %lu\n", sizeof(*a), sizeof(*b), sizeof(*c), sizeof(*d));
-    //print_heap(stdout);
+    print_heap(stdout);
+	printf("new\n");
+	freemem(d);
+	print_heap(stdout);
+	freemem(c);
+	print_heap(stdout);
+	freemem(a);
+	print_heap(stdout);
+	//print_heap(stdout);
     //getmem(3241234124);
     //print_heap(stdout);
     return 0;

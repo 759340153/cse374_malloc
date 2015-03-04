@@ -32,11 +32,11 @@ int freeMem = 0;
 void* getmem(uintptr_t size) {
     if (!root) {
         root = mallocData(root, 0);
-        print_heap(stdout);
+        //print_heap(stdout);
         //current = root;
     }
     memNode * choosenBlock = chooseBlock(root, NULL, size);
-    return (void *) choosenBlock->next+sizeof(uintptr_t); //should be start of data
+    return (void *) choosenBlock+sizeof(memNode); //should be start of data
 }
 
 //return
@@ -49,7 +49,7 @@ memNode * splitBlock(memNode * block, uintptr_t splitSize) {
     newBlock.size = oldSize-splitSize-sizeof(memNode); // set the new size.
     newBlock.next = (uintptr_t) NULL;
     *(memNode *)(block->next) = newBlock; //lol wat (does this werk?)
-    print_heap(stdout);
+    //print_heap(stdout);
     return block; //do we need to return this, or should we figure out a new way
 }
 
@@ -73,6 +73,7 @@ memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size) {
     else {
         root = (memNode *) block->next;
     }
+	block->next = (uintptr_t) NULL;
     return block;
 }
 
