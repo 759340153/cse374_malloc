@@ -61,7 +61,7 @@ memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size) {
         else {
             memNode * newBlock = mallocData((memNode *)block->next, size);
             block->next = (uintptr_t) newBlock; //link the new block
-            return chooseBlock(newBlock, NULL ,size);
+            return chooseBlock(newBlock, block ,size);
         }
     }
     else if (root->size > maxOveragePercent*size) {
