@@ -20,6 +20,7 @@ memNode * splitBlock(memNode * block, uintptr_t Splitsize); //split a block into
 void removeFromFree(memNode * block); //remove a memnode from the freelist
 memNode * mallocData(memNode * block, uintptr_t size); //give memory to a block
 memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size);
+uintptr_t align16(uintptr_t num);
 //globals
 memNode * root;
 
@@ -30,23 +31,17 @@ int freeMem = 0;
 //grab at least size amount of mem and return a void pointer to the user
 void* getmem(uintptr_t size) {
     if (!root) {
-        root = mallocData(root, NULL);
+        root = mallocData(root, 0);
         print_heap(stdout);
         //current = root;
     }
     memNode * choosenBlock = chooseBlock(root, NULL, size);
-    return (void *) &choosenBlock->next+1; //should be start of data
+    return (void *) choosenBlock->next+sizeof(uintptr_t); //should be start of data
 }
 
 //return
 memNode * splitBlock(memNode * block, uintptr_t splitSize) {
-    int alignment = splitSize % ALIGN_VAL;
-    if(alignment) {
-        splitSize = splitSize + ALIGN_VAL - alignment;
-    }
-    else if (splitSize < ALIGN_VAL) {
-        splitSize = ALIGN_VAL;
-    }
+    splitSize = align16(splitSize);
     uintptr_t oldSize = block->size;
     block->size = splitSize;
     block->next = (uintptr_t) block+splitSize+sizeof(memNode); //maybe want a define for fields?
@@ -60,13 +55,13 @@ memNode * splitBlock(memNode * block, uintptr_t splitSize) {
 
 memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size) {
     if (block->size < size) {
-        if (block->size) {
+        if (block->size && block->next) {
            return chooseBlock((memNode *) block->next, block, size);
         }
         else {
-            //also needs to account for if getmem is called on an amount
-            //larger than LARGE_BLOCK_SIZE
-            return chooseBlock(mallocData(block, size), NULL ,size); //errr might need to link things
+            memNode * newBlock = mallocData((memNode *)block->next, size);
+            block->next = (uintptr_t) newBlock; //link the new block
+            return chooseBlock(newBlock, NULL ,size);
         }
     }
     else if (root->size > maxOveragePercent*size) {
@@ -81,14 +76,29 @@ memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size) {
     return block;
 }
 
+//align a number to 16
+uintptr_t align16(uintptr_t num) {
+    int alignment = num % ALIGN_VAL;
+    if(num < ALIGN_VAL) {
+        num = ALIGN_VAL;
+    }
+    else if (alignment) {
+        num = num + ALIGN_VAL - alignment;
+        printf("%lu\n", num % ALIGN_VAL);
+    }
+    return num;
+}
+
 void removeFromFree(memNode * block) {
     //remove a memNode wheee
 }
 
 memNode * mallocData(memNode * block, uintptr_t size) {
     if (size > LARGE_BLOCK_SIZE) {
-        block = malloc(size);
-        block->size = LARGE_BLOCK_SIZE-sizeof(memNode);
+        //although malloc does this, the exact size will not be known
+        size = align16(size);
+        block = malloc(size+sizeof(memNode));
+        block->size = size;
     }
     else {
         block = malloc(LARGE_BLOCK_SIZE);
