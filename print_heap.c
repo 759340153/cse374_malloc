@@ -7,6 +7,7 @@
 //
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "mem_impl.h"
 #define ALIGN_VAL 16 //move into mem-impl.h
 extern memNode * root; //figure out a way to put this in mem_impl.h
