@@ -1,5 +1,4 @@
 //get_mem_stats.c
-#include <inttypes.h>
 #include "mem_impl.h"
 #include "externs.h"
 
