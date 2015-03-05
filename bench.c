@@ -29,27 +29,29 @@ int main(int argc, const char * argv[]) {
     // run the main memory testing code
     //create a array of ntrial size to keep track of allocs
     //as well as inc numbe rof allocs
-    int ntrials;
-    int pctget;
-    int pctlarge;
-    int small_limit;
-    int large_limit;
-    int random_seed;
+    int ntrials = 0;
+    int pctget = 0;
+    int pctlarge = 0;
+    int small_limit = 0;
+    int large_limit = 0;
+    int random_seed = 0;
     switch(argc) {
         case 7:
-            random_seed = atio(argv[6]);
+            random_seed = atoi(argv[6]);
         case 6:
-            large_limit = atio(argv[5]);
+            large_limit = atoi(argv[5]);
         case 5:
-            small_limit = atio(argv[4]);
+            small_limit = atoi(argv[4]);
         case 4:
-            pctlarge = atio(argv[3]);
+            pctlarge = atoi(argv[3]);
         case 3:
-            pctget = atio(argv[2]);
+            pctget = atoi(argv[2]);
         case 2:
-            ntrials = atio(argv[1]);
+            ntrials = atoi(argv[1]);
     }
     return 0;
+    ntrials = ntrials ? ntrials : def_ntrial;
+    printf("%d", ntrials);
 }
 
 int getRandom(int size) {
