@@ -23,10 +23,10 @@ memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size);
 uintptr_t align16(uintptr_t num);
 //globals
 memNode * root;
-
+//used for get stats
+int totalSize = 0;
 int totalFree = 0;
-int usedMem = 0;
-int freeMem = 0;
+int nFreeBlocks = 0;
 
 //grab at least size amount of mem and return a void pointer to the user
 void* getmem(uintptr_t size) {
@@ -100,6 +100,7 @@ memNode * mallocData(memNode * block, uintptr_t size) {
         size = align16(size);
         block = malloc(size+sizeof(memNode));
         block->size = size;
+        total
     }
     else {
         block = malloc(LARGE_BLOCK_SIZE);

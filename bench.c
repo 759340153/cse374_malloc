@@ -29,45 +29,26 @@ int main(int argc, const char * argv[]) {
     // run the main memory testing code
     //create a array of ntrial size to keep track of allocs
     //as well as inc numbe rof allocs
-    //delete
-    //
-	//root=malloc(1024);
-	//root->size = 16;
-	//printf("%zu\n", sizeof(uintptr_t *));
-	//printf("%zu\n", sizeof(*root));
-	//printf("%zu\n", root->size);
-	//printf("%p  %lu\n", &root, root + (root->size+16) - root);
-    printf("Hello, memory!\n");
-    //temp getmem tests weee
-    int * a;
-    //print_heap(stdout);
-    a = (int *) getmem(32);
-    //print_heap(stdout);
-    a[31] = 1;
-    a[32] = 1;
-    printf("%lu, %d\n", sizeof(*a), a[31]);
-    int * b;
-    b = (int *) getmem(14);
-    //print_heap(stdout);
-    //freemem();
-    char * c = getmem(463);
-    //print_heap(stdout);
-    char * d = getmem(45);
-    printf("a: %lu, b: %lu, c: %lu, d: %lu\n", sizeof(*a), sizeof(*b), sizeof(*c), sizeof(*d));
-    print_heap(stdout);
-	printf("new\n");
-	freemem(c);
-	print_heap(stdout);
-	freemem(d);
-	print_heap(stdout);
-	freemem(a);
-	print_heap(stdout);
-	freemem(b);
-	print_heap(stdout);
-	//print_heap(stdout);
-    int * lol = getmem(3241234124);
-	freemem(lol);
-    print_heap(stdout);
+    int ntrials;
+    int pctget;
+    int pctlarge;
+    int small_limit;
+    int large_limit;
+    int random_seed;
+    switch(argc) {
+        case 7:
+            random_seed = atio(argv[6]);
+        case 6:
+            large_limit = atio(argv[5]);
+        case 5:
+            small_limit = atio(argv[4]);
+        case 4:
+            pctlarge = atio(argv[3]);
+        case 3:
+            pctget = atio(argv[2]);
+        case 2:
+            ntrials = atio(argv[1]);
+    }
     return 0;
 }
 
