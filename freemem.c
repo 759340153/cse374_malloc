@@ -24,8 +24,8 @@ void freemem(void * p) {
 	memNode* pNode = p - sizeof(memNode);
 	memNode * prev = findMemorySpot(pNode);
 	addToFree(pNode, prev);
-	freeMem = freeMem + pNode->size + sizeof(memNode);
-	totalFree = totalFree + 1;
+	totalFree = totalFree + pNode->size + sizeof(memNode);
+	nFreeBlocks = nFreeBlocks + 1;
 	combineSmallBlocks(pNode, prev);
 }
 
@@ -42,7 +42,7 @@ void combineSmallBlocks(memNode * p, memNode * prev) {
 			} else {
 				p->next = (uintptr_t) NULL;
 			}
-			totalFree = totalFree - 1;
+			nFreeBlocks = nFreeBlocks - 1;
 		}
 	}
 	if (prev) {
@@ -53,7 +53,7 @@ void combineSmallBlocks(memNode * p, memNode * prev) {
 			} else {
 				prev->next = (uintptr_t) NULL;
 			}
-			totalFree = totalFree - 1;
+			nFreeBlocks = nFreeBlocks - 1;
 		}
 	}
 }

@@ -1,4 +1,4 @@
 extern memNode * root;
+extern int totalSize;
 extern int totalFree;
-extern int usedMem;
-extern int freeMem;
+extern int nFreeBlocks;
