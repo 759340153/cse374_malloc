@@ -59,14 +59,14 @@ int main(int argc, const char * argv[]) {
     large_limit = large_limit ? large_limit : def_large_limit;
     random_seed = random_seed ? random_seed : getRandomSeed();
     uintptr_t *usedBlocks = (uintptr_t *) malloc(sizeof(uintptr_t)*ntrials);
-    uintptr_t *totalSize;
-    uintptr_t *totalFree;
-    uintptr_t *nFreeBlocks;
+    uintptr_t totalSize;
+    uintptr_t totalFree;
+    uintptr_t nFreeBlocks;
     //usedBlocks = (uintptr_t *) malloc(sizeof(uintptr_t)*ntrials);
     srand(random_seed); //setup random seed
     for (int i = 0; i < ntrials; i++) {
-        get_mem_stats(totalSize, totalFree, nFreeBlocks);
-        runRandomOp(usedBlocks, nFreeBlocks);
+        get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
+        runRandomOp(usedBlocks, &nFreeBlocks);
     }
     return 0;
 }
@@ -101,9 +101,10 @@ void getRandom(uintptr_t *usedBlocks, uintptr_t * nFreeBlocks) {
 }
 
 void freeRandom(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks) {
-    int index = rand() % *nFreeBlocks;
-    uintptr_t nodeAtlastIndex = usedBlocks[*nFreeBlocks];
-    
-    freemem((void *)usedBlocks[index]);
-    usedBlocks[index] = nodeAtlastIndex;
+    if (*nFreeBlocks) {
+        int index = rand() % *nFreeBlocks;
+        uintptr_t nodeAtlastIndex = usedBlocks[*nFreeBlocks];
+        freemem((void *)usedBlocks[index]);
+        usedBlocks[index] = nodeAtlastIndex;
+    }
 }
