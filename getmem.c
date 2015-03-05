@@ -103,14 +103,13 @@ memNode * mallocData(memNode * block, uintptr_t size) {
         size = align16(size);
         block = malloc(size+sizeof(memNode));
         block->size = size;
-        totalSize += size;
-        totalFree += size;
-        nFreeBlocks += 1;
     }
     else {
         block = malloc(LARGE_BLOCK_SIZE);
         block->size = LARGE_BLOCK_SIZE-sizeof(memNode); //should be 16 less
     }
-    printf("%d \n ", LARGE_BLOCK_SIZE);
+    totalSize += size;
+    totalFree += size;
+    nFreeBlocks += 1;
     return block;
 }
