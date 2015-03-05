@@ -2,11 +2,7 @@
 #include <inttypes.h>
 #include "mem.h"
 #include "mem_impl.h"
-
-extern memNode * root;
-extern int totalFree;
-extern int usedMem;
-extern int freeMem;
+#include "externs.h"
 
 void freemem(void * p);
 void combineSmallBlocks(memNode * p, memNode * prev);
@@ -21,30 +17,36 @@ void freemem(void * p) {
 	memNode* pNode = p - sizeof(memNode);
 	memNode * prev = findMemorySpot(pNode);
 	addToFree(pNode, prev);
+	freeMem = freeMem + pNode->size + sizeof(memNode);
+	totalFree = totalFree + 1;
 	combineSmallBlocks(pNode, prev);
 }
 
 void combineSmallBlocks(memNode * p, memNode * prev) {
 	if (p->next) {
-		printf("next exists\n");
 		memNode * pNext = (memNode *) p->next;
 		if ((long) p + p->size + sizeof(memNode) - (long) pNext == 0) {
-			p->size = p->size + pNext->size + 2*sizeof(memNode);
-			if (pNext->next) {
-				p->next = pNext->next;
-			} else {
-				p->next = (uintptr_t) NULL;
+			if ((int) p->size + (int) pNext->size >= 128) {
+				p->size = p->size + pNext->size + 2*sizeof(memNode);
+				if (pNext->next) {
+					p->next = pNext->next;
+				} else {
+					p->next = (uintptr_t) NULL;
+				}
+				totalFree = totalFree - 1;
 			}
 		}
 	}
 	if (prev) {
-		printf("prev exists\n");
 		if ((long) prev + prev->size+16 - (long) p == 0) {
-			prev->size = prev->size + p->size + 32;
-			if (p->next) {
-				prev->next = p->next;
-			} else {
-				prev->next = (uintptr_t) NULL;
+			if ((int) prev->size + (int) p->size >= 128) {
+				prev->size = prev->size + p->size + 32;
+				if (p->next) {
+					prev->next = p->next;
+				} else {
+					prev->next = (uintptr_t) NULL;
+				}
+				totalFree = totalFree - 1;
 			}
 		}
 	}

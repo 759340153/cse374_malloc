@@ -65,8 +65,9 @@ int main(int argc, const char * argv[]) {
 	freemem(b);
 	print_heap(stdout);
 	//print_heap(stdout);
-    //getmem(3241234124);
-    //print_heap(stdout);
+    int * lol = getmem(3241234124);
+	freemem(lol);
+    print_heap(stdout);
     return 0;
 }
 
