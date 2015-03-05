@@ -63,7 +63,7 @@ memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size) {
         }
         else {
             memNode * newBlock = mallocData((memNode *)block->next, size);
-            //block->next = (uintptr_t) newBlock; //link the new block
+            block->next = (uintptr_t) newBlock; //link the new block
             return chooseBlock(newBlock, block ,size);
         }
     }
@@ -103,13 +103,15 @@ memNode * mallocData(memNode * block, uintptr_t size) {
         size = align16(size);
         block = malloc(size+sizeof(memNode));
         block->size = size;
+        totalSize += size;
+        totalFree += size;
     }
     else {
         block = malloc(LARGE_BLOCK_SIZE);
         block->size = LARGE_BLOCK_SIZE-sizeof(memNode); //should be 16 less
+        totalSize += LARGE_BLOCK_SIZE;
+        totalFree += LARGE_BLOCK_SIZE;
     }
-    totalSize += size;
-    totalFree += size;
     nFreeBlocks += 1;
     return block;
 }
