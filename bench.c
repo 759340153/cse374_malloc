@@ -22,8 +22,10 @@ extern memNode * root;
 
 //function prototypes
 int getRandomSeed(); //reads from /dev/urandom for size
-void runRandomOp(); //run ethier a getmem or freemem op
-void freeRandom(int allocs[], int * size); //free a random block
+void runRandomOp(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks);
+void getRandom(uintptr_t *usedBlocks, uintptr_t * nFreeBlocks);
+void freeRandom(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks);
+//void freeRandom(int allocs[], int * size); //free a random block
 //Command line argument globals
 int ntrials = 0;
 int pctget = 0;
@@ -56,11 +58,15 @@ int main(int argc, const char * argv[]) {
     small_limit = small_limit ? small_limit : def_small_limit;
     large_limit = large_limit ? large_limit : def_large_limit;
     random_seed = random_seed ? random_seed : getRandomSeed();
-    uintptr_t *usedBlocks;
-    usedBlocks = (uintptr_t *) malloc(sizeof(uintptr_t)*ntrials);
+    uintptr_t *usedBlocks = (uintptr_t *) malloc(sizeof(uintptr_t)*ntrials);
+    uintptr_t *totalSize;
+    uintptr_t *totalFree;
+    uintptr_t *nFreeBlocks;
+    //usedBlocks = (uintptr_t *) malloc(sizeof(uintptr_t)*ntrials);
     srand(random_seed); //setup random seed
     for (int i = 0; i < ntrials; i++) {
-        runRandomOp(usedBlocks);
+        get_mem_stats(totalSize, totalFree, nFreeBlocks);
+        runRandomOp(usedBlocks, nFreeBlocks);
     }
     return 0;
 }
@@ -74,15 +80,30 @@ int getRandomSeed() {
     return (int) data;
 }
 
-void runRandomOp(uintptr_t usedBlocks) {
+void runRandomOp(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks) {
     if (rand() % 100 > pctget) {
-        freeRandom(usedBlocks);
+        freeRandom(usedBlocks, nFreeBlocks);
     }
     else {
-        getRandom(usedBlocks);
+        getRandom(usedBlocks, nFreeBlocks);
     }
 }
 
-void freeRandom(uintptr_t usedBlocks) {
+void getRandom(uintptr_t *usedBlocks, uintptr_t * nFreeBlocks) {
+    uintptr_t num;
+    if(rand() % 100 > pctlarge) {
+        num = (rand() % small_limit) + 1;
+    }
+    else {
+        num = (rand()%(large_limit-small_limit))+small_limit;
+    }
+    usedBlocks[*nFreeBlocks] = (uintptr_t) getmem(num); //probs wont ever assign 0? need to check this
+}
+
+void freeRandom(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks) {
+    int index = rand() % *nFreeBlocks;
+    uintptr_t nodeAtlastIndex = usedBlocks[*nFreeBlocks];
     
+    freemem((void *)usedBlocks[index]);
+    usedBlocks[index] = nodeAtlastIndex;
 }
