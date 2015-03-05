@@ -49,37 +49,6 @@ int main(int argc, const char * argv[]) {
         case 2:
             ntrials = atio(argv[1]);
     }
-    
-    //temp getmem tests weee
-    int * a;
-    //print_heap(stdout);
-    a = (int *) getmem(32);
-    //print_heap(stdout);
-    a[31] = 1;
-    a[32] = 1;
-    printf("%lu, %d\n", sizeof(*a), a[31]);
-    int * b;
-    b = (int *) getmem(14);
-    //print_heap(stdout);
-    //freemem();
-    char * c = getmem(463);
-    //print_heap(stdout);
-    char * d = getmem(45);
-    printf("a: %lu, b: %lu, c: %lu, d: %lu\n", sizeof(*a), sizeof(*b), sizeof(*c), sizeof(*d));
-    print_heap(stdout);
-	printf("new\n");
-	freemem(c);
-	print_heap(stdout);
-	freemem(d);
-	print_heap(stdout);
-	freemem(a);
-	print_heap(stdout);
-	freemem(b);
-	print_heap(stdout);
-	//print_heap(stdout);
-    int * bitches = getmem(3241234124);
-    freemem(bitches);
-    print_heap(stdout);
     return 0;
 }
 

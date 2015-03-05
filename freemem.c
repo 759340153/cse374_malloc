@@ -1,19 +1,22 @@
-//freemem.c
-#include <inttypes.h>
-#include "mem.h"
-#include "mem_impl.h"
+//Alex Gingras and Max Golub
+//CSE 374 HW 6
+//3/4/2015
+//This is freemem, which takes a pointer to a data field which the user has
+//gotten using getmem and adds it to the freeList so that it may be gotten again.
+//It also combines contiguous blocks of memory if they are past a certain size threshold
 
-extern memNode * root;
-extern int totalFree;
-extern int usedMem;
-extern int freeMem;
+#include <inttypes.h>
+#include "mem.h" //function protos
+#include "mem_impl.h" //definition of a memNode
+#include "externs.h" //external variabls to keep track of stats
 
 void freemem(void * p);
 void combineSmallBlocks(memNode * p, memNode * prev);
 memNode * findMemorySpot(memNode * p);
 void addToFree(memNode * p, memNode * prev);
 
-//will free the block of memory the passed in pointer points to
+//Takes in a pointer, and frees the block of memory associated with that pointer.
+//Also combines blocks of memory if they are contiguous and larger than a certain threshold 
 void freemem(void * p) {
 	if (!p) {
 		return;
@@ -21,12 +24,16 @@ void freemem(void * p) {
 	memNode* pNode = p - sizeof(memNode);
 	memNode * prev = findMemorySpot(pNode);
 	addToFree(pNode, prev);
+	freeMem = freeMem + pNode->size + sizeof(memNode);
+	totalFree = totalFree + 1;
 	combineSmallBlocks(pNode, prev);
 }
 
+//combines all contiguous blocks into one large block
+//takes in the pointer that is being freed and a pointer to to the
+//memNode before p.
 void combineSmallBlocks(memNode * p, memNode * prev) {
 	if (p->next) {
-		printf("next exists\n");
 		memNode * pNext = (memNode *) p->next;
 		if ((long) p + p->size + sizeof(memNode) - (long) pNext == 0) {
 			p->size = p->size + pNext->size + 2*sizeof(memNode);
@@ -35,10 +42,10 @@ void combineSmallBlocks(memNode * p, memNode * prev) {
 			} else {
 				p->next = (uintptr_t) NULL;
 			}
+			totalFree = totalFree - 1;
 		}
 	}
 	if (prev) {
-		printf("prev exists\n");
 		if ((long) prev + prev->size+16 - (long) p == 0) {
 			prev->size = prev->size + p->size + 32;
 			if (p->next) {
@@ -46,6 +53,7 @@ void combineSmallBlocks(memNode * p, memNode * prev) {
 			} else {
 				prev->next = (uintptr_t) NULL;
 			}
+			totalFree = totalFree - 1;
 		}
 	}
 }
@@ -69,6 +77,8 @@ memNode * findMemorySpot(memNode * p) {
 	return node;
 }
 
+//takes in the memNode being freed and a pointer to the node before p
+//adds p to the freelist.
 void addToFree(memNode * p, memNode * prev) {
 	if (!prev) {
 		if (root) {
@@ -84,3 +94,4 @@ void addToFree(memNode * p, memNode * prev) {
 		prev->next = (uintptr_t) p;
 	}
 }
+
