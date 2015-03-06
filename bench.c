@@ -1,8 +1,17 @@
 //
 //  bench.c
-//  hw6
+//  hw6 CSE 374
 //
-//  Created by Max Golub on 2/25/15.
+//  Runs a benchmark program agaisnt our freemem and getmem implementations.
+//  Usage : bench [ntrials [pctget [pctlarge [small_limit [large_limit [random_seed ]]]]]]
+//  ntrials : Number of trials to run, default 10000
+//  pctget : percetage of total freemem/getmem calls that go to getmem, default 50
+//  pctlarge : percetage of total getmems that are large blocks. default 10
+//  small_limit : largest small block, default 200
+//  large_limit : largest large block, default 20000
+//  random_seed : Random seed for use with rand() default is pulled from urandom
+//
+//  Created by Max Golub and Alex Gingras on 2/25/15.
 //  Copyright (c) 2015 Max Golub. All rights reserved.
 //
 
