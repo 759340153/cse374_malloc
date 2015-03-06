@@ -69,7 +69,7 @@ memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size) {
             return chooseBlock(newBlock, block ,size);
         }
     }
-    else if (block->size > size + maxOveragePercent*size && block->size > size + (16 - size % 16)) {
+    else if (block->size > size + maxOveragePercent*size && block->size > size + (16 - size % 16) + 16) {
         block = splitBlock(block, size);
 		printf("SPLIT\n");
 		print_heap(stdout);
