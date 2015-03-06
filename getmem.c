@@ -31,7 +31,7 @@ int nFreeBlocks = 0;
 //grab at least size amount of mem and return a void pointer to the user
 void* getmem(uintptr_t size) {
     if (!root) {
-        root = mallocData(root, LARGE_BLOCK_SIZE);
+        root = mallocData(root, 0);
 		nFreeBlocks += 1;
     }
     memNode * choosenBlock = chooseBlock(root, NULL, size);
@@ -48,10 +48,14 @@ memNode * splitBlock(memNode * block, uintptr_t splitSize) {
     uintptr_t oldBlockNext = block->next;
     block->size = splitSize;
     block->next = (uintptr_t) block+splitSize+sizeof(memNode);
+	//???
+	
+	
     memNode newBlock;
     newBlock.size = oldSize-splitSize-sizeof(memNode); // set the new size.
     newBlock.next = oldBlockNext;
     *(memNode *)(block->next) = newBlock; //lol wat (does this werk?)
+	//???
     nFreeBlocks += 1;
     totalFree -= sizeof(memNode);
     return block;
@@ -66,7 +70,6 @@ memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size) {
         else {
             memNode * newBlock = mallocData((memNode *)block->next, size);
             block->next = (uintptr_t) newBlock; //link the new block
-			printf("NEW BLOCK RECURSE\n");
             return chooseBlock(newBlock, block ,size);
         }
     }
@@ -102,12 +105,20 @@ void removeFromFree(memNode * block) {
 }
 
 memNode * mallocData(memNode * block, uintptr_t size) {
-    //although malloc does this, the exact size will not be known
-    size = align16(size);
-    block = malloc(size+sizeof(memNode));
-    block->size = size;
-    totalSize += size;
-    totalFree += size;
+    if (size > LARGE_BLOCK_SIZE) {
+        //although malloc does this, the exact size will not be known
+        size = align16(size);
+        block = malloc(size+sizeof(memNode));
+        block->size = size;
+        totalSize += size;
+        totalFree += size;
+    }
+    else {
+        block = malloc(LARGE_BLOCK_SIZE);
+        block->size = LARGE_BLOCK_SIZE-sizeof(memNode); //should be 16 less
+        totalSize += LARGE_BLOCK_SIZE;
+        totalFree += LARGE_BLOCK_SIZE;
+    }
     nFreeBlocks += 1;
     return block;
 }
