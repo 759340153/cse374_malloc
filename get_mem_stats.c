@@ -1,4 +1,8 @@
-//get_mem_stats.c
+//Alex Gingras and Max Golub
+//CSE 374 HW 6
+//3/4/2015
+//get_mem_stats allows a user to get some stats about the freeList and the 
+//amount of memory allocated over the session
 #include "mem_impl.h"
 #include "externs.h"
 
