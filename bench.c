@@ -70,7 +70,12 @@ int main(int argc, const char * argv[]) {
         numberOfGottenBlocks = runRandomOp(usedBlocks, numberOfGottenBlocks);
 		get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
 		printf("%lu\n", numberOfGottenBlocks);
-		printArray(usedBlocks, numberOfGottenBlocks);
+		if (i % 5 == 0) {
+			printf("array\n");
+			printArray(usedBlocks, numberOfGottenBlocks);
+			printf("heap\n");
+			print_heap(stdout);
+		}
     }
     return 0;
 }
