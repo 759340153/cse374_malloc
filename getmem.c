@@ -45,11 +45,12 @@ void* getmem(uintptr_t size) {
 memNode * splitBlock(memNode * block, uintptr_t splitSize) {
     splitSize = align16(splitSize);
     uintptr_t oldSize = block->size;
+    uintptr_t oldBlockNext = block->next;
     block->size = splitSize;
     block->next = (uintptr_t) block+splitSize+sizeof(memNode);
     memNode newBlock;
     newBlock.size = oldSize-splitSize-sizeof(memNode); // set the new size.
-    newBlock.next = (uintptr_t) NULL;
+    newBlock.next = oldBlockNext;
     *(memNode *)(block->next) = newBlock; //lol wat (does this werk?)
     nFreeBlocks += 1;
     totalFree -= sizeof(memNode);
