@@ -49,7 +49,7 @@ void combineSmallBlocks(memNode * p, memNode * prev) {
 	}
 	if (prev) {
 		if ((long) prev + prev->size+sizeof(memNode) - (long) p == 0) {
-			prev->size = prev->size + p->size + 2*sizeof(memNode);
+			prev->size = prev->size + p->size + sizeof(memNode);
 			if (p->next) {
 				prev->next = p->next;
 			} else {
