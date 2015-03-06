@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mem.h"
-#include <unistd.h> //command line parsing
+
 //small and large block limits
 #define def_ntrial 10000
 #define def_pctget 50
@@ -26,7 +26,7 @@ int runRandomOp(uintptr_t * usedBlocks, int numberOfGottenBlocks);
 void getRandom(uintptr_t *usedBlocks, int numberOfGottenBlocks);
 void freeRandom(uintptr_t * usedBlocks, int numberOfGottenBlocks);
 void printArray(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks);
-//void freeRandom(int allocs[], int * size); //free a random block
+
 //Command line argument globals
 int ntrials = 0;
 int pctget = 0;
@@ -36,6 +36,10 @@ int large_limit = 0;
 int random_seed = 0;
 int numberOfGottenBlocks = 0;
 
+/*
+ Main program, which parses arguments passed in by the user and
+ then calls a for loop to run ntraisl worth of tests on freemem and getmem.
+ */
 int main(int argc, const char * argv[]) {
     // run the main memory testing code
     //create a array of ntrial size to keep track of allocs
@@ -54,6 +58,7 @@ int main(int argc, const char * argv[]) {
         case 2:
             ntrials = atoi(argv[1]);
     }
+    //set the arguments to default if they are not currently set.
     ntrials = ntrials ? ntrials : def_ntrial;
     pctget = pctget ? pctget : def_pctget;
     pctlarge = pctlarge ? pctlarge : def_pctlarge;
@@ -64,22 +69,17 @@ int main(int argc, const char * argv[]) {
     uintptr_t totalSize;
     uintptr_t totalFree;
     uintptr_t nFreeBlocks;
-    //usedBlocks = (uintptr_t *) malloc(sizeof(uintptr_t)*ntrials);
     srand(random_seed); //setup random seed
     for (int i = 0; i < ntrials; i++) {
         numberOfGottenBlocks = runRandomOp(usedBlocks, numberOfGottenBlocks);
 		get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
-		printf("%lu\n", numberOfGottenBlocks);
-		if (i % 5 == 0) {
-			printf("array\n");
-			printArray(usedBlocks, numberOfGottenBlocks);
-			printf("heap\n");
-			print_heap(stdout);
-		}
     }
     return 0;
 }
 
+/*
+ Open up /dev/urandom and get an ints worth of random data from it.
+ */
 int getRandomSeed() {
     char data[randomSize];
     FILE *fp;
@@ -89,9 +89,11 @@ int getRandomSeed() {
     return (int) data;
 }
 
+/*
+ Run a random operation, either free or get mem.
+ */
 int runRandomOp(uintptr_t * usedBlocks, int numberOfGottenBlocks) {
     if (rand() % 100 > pctget) {
-		printf("free\n");
         freeRandom(usedBlocks, numberOfGottenBlocks);
 		if(numberOfGottenBlocks > 0) {
 			return numberOfGottenBlocks - 1;
@@ -100,41 +102,34 @@ int runRandomOp(uintptr_t * usedBlocks, int numberOfGottenBlocks) {
 		}
     }
     else {
-		printf("get\n");
         getRandom(usedBlocks, numberOfGottenBlocks);
 		return numberOfGottenBlocks + 1;
     }
 }
 
+/*
+ get a random amount of data based on the percentage pctlarge and
+ the large and small limits.
+ */
 void getRandom(uintptr_t *usedBlocks, int numberOfGottenBlocks) {
     uintptr_t num;
     if(rand() % 100 >= pctlarge) {
-		printf("   small\n");
         num = (rand() % small_limit) + 1;
     }
     else {
-		printf("   large\n");
         num = (rand()%(large_limit-small_limit))+small_limit;
     }
-	printf("      %lu\n", num);
     usedBlocks[numberOfGottenBlocks] = (uintptr_t) getmem(num);  //seg fault
 }
-
+/*
+ Free a random block by selecting usedBlocks[randomnumber] and attempting
+ to call freemem on that pointer.
+ */
 void freeRandom(uintptr_t * usedBlocks, int numberOfGottenBlocks) {
 	if (numberOfGottenBlocks > 0) {
         int index = rand() % numberOfGottenBlocks;
         uintptr_t nodeAtlastIndex = usedBlocks[numberOfGottenBlocks - 1];
         freemem((void *)usedBlocks[index]);
         usedBlocks[index] = nodeAtlastIndex;
-		printf("   freed\n");
     }
-}
-
-void printArray(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks) {
-	if (numberOfGottenBlocks > 0) {
-		for (int i = 0; i < numberOfGottenBlocks; i++) {
-			printf("0x%081x\n", (long) usedBlocks[i] - 16);
-		}
-	}
-
 }
