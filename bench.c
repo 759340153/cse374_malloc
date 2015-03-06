@@ -22,9 +22,10 @@ extern memNode * root;
 
 //function prototypes
 int getRandomSeed(); //reads from /dev/urandom for size
-void runRandomOp(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks);
-void getRandom(uintptr_t *usedBlocks, uintptr_t * nFreeBlocks);
-void freeRandom(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks);
+int runRandomOp(uintptr_t * usedBlocks, int numberOfGottenBlocks);
+void getRandom(uintptr_t *usedBlocks, int numberOfGottenBlocks);
+void freeRandom(uintptr_t * usedBlocks, int numberOfGottenBlocks);
+void printArray(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks);
 //void freeRandom(int allocs[], int * size); //free a random block
 //Command line argument globals
 int ntrials = 0;
@@ -33,6 +34,7 @@ int pctlarge = 0;
 int small_limit = 0;
 int large_limit = 0;
 int random_seed = 0;
+int numberOfGottenBlocks = 0;
 
 int main(int argc, const char * argv[]) {
     // run the main memory testing code
@@ -65,8 +67,10 @@ int main(int argc, const char * argv[]) {
     //usedBlocks = (uintptr_t *) malloc(sizeof(uintptr_t)*ntrials);
     srand(random_seed); //setup random seed
     for (int i = 0; i < ntrials; i++) {
-        get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
-        runRandomOp(usedBlocks, &nFreeBlocks);
+        numberOfGottenBlocks = runRandomOp(usedBlocks, numberOfGottenBlocks);
+		get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
+		printf("%lu\n", numberOfGottenBlocks);
+		printArray(usedBlocks, numberOfGottenBlocks);
     }
     return 0;
 }
@@ -80,31 +84,52 @@ int getRandomSeed() {
     return (int) data;
 }
 
-void runRandomOp(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks) {
+int runRandomOp(uintptr_t * usedBlocks, int numberOfGottenBlocks) {
     if (rand() % 100 > pctget) {
-        freeRandom(usedBlocks, nFreeBlocks);
+		printf("free\n");
+        freeRandom(usedBlocks, numberOfGottenBlocks);
+		if(numberOfGottenBlocks > 0) {
+			return numberOfGottenBlocks - 1;
+		} else {
+			return numberOfGottenBlocks;
+		}
     }
     else {
-        getRandom(usedBlocks, nFreeBlocks);
+		printf("get\n");
+        getRandom(usedBlocks, numberOfGottenBlocks);
+		return numberOfGottenBlocks + 1;
     }
 }
 
-void getRandom(uintptr_t *usedBlocks, uintptr_t * nFreeBlocks) {
+void getRandom(uintptr_t *usedBlocks, int numberOfGottenBlocks) {
     uintptr_t num;
-    if(rand() % 100 > pctlarge) {
+    if(rand() % 100 >= pctlarge) {
+		printf("   small\n");
         num = (rand() % small_limit) + 1;
     }
     else {
+		printf("   large\n");
         num = (rand()%(large_limit-small_limit))+small_limit;
     }
-    usedBlocks[*nFreeBlocks] = (uintptr_t) getmem(num); //probs wont ever assign 0? need to check this
+	printf("      %lu\n", num);
+    usedBlocks[numberOfGottenBlocks] = (uintptr_t) getmem(num);  //seg fault
 }
 
-void freeRandom(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks) {
-    if (*nFreeBlocks) {
-        int index = rand() % *nFreeBlocks;
-        uintptr_t nodeAtlastIndex = usedBlocks[*nFreeBlocks];
+void freeRandom(uintptr_t * usedBlocks, int numberOfGottenBlocks) {
+	if (numberOfGottenBlocks > 0) {
+        int index = rand() % numberOfGottenBlocks;
+        uintptr_t nodeAtlastIndex = usedBlocks[numberOfGottenBlocks - 1];
         freemem((void *)usedBlocks[index]);
         usedBlocks[index] = nodeAtlastIndex;
+		printf("   freed\n");
     }
+}
+
+void printArray(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks) {
+	if (numberOfGottenBlocks > 0) {
+		for (int i = 0; i < numberOfGottenBlocks; i++) {
+			printf("0x%081x\n", (long) usedBlocks[i] - 16);
+		}
+	}
+
 }

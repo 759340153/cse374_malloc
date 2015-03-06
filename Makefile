@@ -13,5 +13,16 @@ get_mem_stats.o: get_mem_stats.c
 
 print_heap.o: print_heap.c
 	gcc -std=c11 -Wall -g -c print_heap.c
+	
 clean:
-	rm -rf *.o bench
+	rm -rf *.o bench *~
+	
+git:
+	git log > git.log
+	
+dist: 
+	tar cvf hw6-aa.tar *.c *.h Makefile git.log README
+	
+test:
+	make bench 
+	./bench

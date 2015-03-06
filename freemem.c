@@ -22,6 +22,8 @@ void freemem(void * p) {
 		return;
 	} 
 	memNode* pNode = p - sizeof(memNode);
+	printf("pNODE: 0x%08lx\n", (long) pNode);
+	printf("0x%08lx\n", (long) root);
 	memNode * prev = findMemorySpot(pNode);
 	addToFree(pNode, prev);
 	totalFree = totalFree + pNode->size + sizeof(memNode);
@@ -61,12 +63,10 @@ void combineSmallBlocks(memNode * p, memNode * prev) {
 //returns a pointer to the data block that appears before the passed in data block in memory
 //returns null if p should be added front of free
 memNode * findMemorySpot(memNode * p) {
-	if (!root || root > p) {
+	if (!root || root >= p) {
 		return NULL;
 	}
 	memNode * node = root;
-	//address of next size is &root + (root->size+2)/8
-	//difference between 2 addresses in bytes is a1 + root->size+16 - a2 
 	while (node->next) {
 		if ((memNode *) node->next < p) {
 			node = (memNode *) node->next;
@@ -82,15 +82,20 @@ memNode * findMemorySpot(memNode * p) {
 void addToFree(memNode * p, memNode * prev) {
 	if (!prev) {
 		if (root) {
-			p->next = (uintptr_t) root;
+			uintptr_t temp = root;
+			printf("0x%08lx\n", (long) temp);
+			p->next = temp;
 			root = p;
+			printf("NOTE: 0x%08lx 0x%08lx \n", (long) root, (long) root->next);
+
 		} else {
 			root = p;
 		}
 	} else if (!prev->next) {
 		prev->next = (uintptr_t) p;
 	} else {
-		p->next = prev->next;
+		uintptr_t temp = prev->next;
+		p->next = temp;
 		prev->next = (uintptr_t) p;
 	}
 }

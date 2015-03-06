@@ -32,8 +32,7 @@ int nFreeBlocks = 0;
 void* getmem(uintptr_t size) {
     if (!root) {
         root = mallocData(root, 0);
-        //print_heap(stdout);
-        //current = root;
+		nFreeBlocks += 1;
     }
     memNode * choosenBlock = chooseBlock(root, NULL, size);
     nFreeBlocks -= 1;
@@ -75,6 +74,7 @@ memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size) {
     }
     else {
         root = (memNode *) block->next;
+		printf("moved root\n");
     }
 	block->next = (uintptr_t) NULL;
     return block;
@@ -88,7 +88,6 @@ uintptr_t align16(uintptr_t num) {
     }
     else if (alignment) {
         num = num + ALIGN_VAL - alignment;
-        printf("%lu\n", num % ALIGN_VAL);
     }
     return num;
 }
