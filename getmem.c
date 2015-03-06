@@ -31,7 +31,7 @@ int nFreeBlocks = 0;
 //grab at least size amount of mem and return a void pointer to the user
 void* getmem(uintptr_t size) {
     if (!root) {
-        root = mallocData(root, 0);
+        root = mallocData(root, LARGE_BLOCK_SIZE);
 		nFreeBlocks += 1;
     }
     memNode * choosenBlock = chooseBlock(root, NULL, size);
@@ -97,20 +97,12 @@ void removeFromFree(memNode * block) {
 }
 
 memNode * mallocData(memNode * block, uintptr_t size) {
-    if (size > LARGE_BLOCK_SIZE) {
-        //although malloc does this, the exact size will not be known
-        size = align16(size);
-        block = malloc(size+sizeof(memNode));
-        block->size = size;
-        totalSize += size;
-        totalFree += size;
-    }
-    else {
-        block = malloc(LARGE_BLOCK_SIZE);
-        block->size = LARGE_BLOCK_SIZE-sizeof(memNode); //should be 16 less
-        totalSize += LARGE_BLOCK_SIZE;
-        totalFree += LARGE_BLOCK_SIZE;
-    }
+    //although malloc does this, the exact size will not be known
+    size = align16(size);
+    block = malloc(size+sizeof(memNode));
+    block->size = size;
+    totalSize += size;
+    totalFree += size;
     nFreeBlocks += 1;
     return block;
 }
