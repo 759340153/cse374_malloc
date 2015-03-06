@@ -69,9 +69,10 @@ memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size) {
             return chooseBlock(newBlock, block ,size);
         }
     }
-    else if (block->size > maxOveragePercent*size) {
-        splitBlock(block, size);
+    else if (block->size > size + maxOveragePercent*size && block->size > size + (16 - size % 16)) {
+        block = splitBlock(block, size);
 		printf("SPLIT\n");
+		print_heap(stdout);
     }
     if (prevBlock) {
         prevBlock->next = block->next; //remove block from linked list

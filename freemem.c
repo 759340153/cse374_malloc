@@ -22,7 +22,7 @@ void freemem(void * p) {
 		return;
 	} 
 	memNode* pNode = p - sizeof(memNode);
-	printf("pNODE: 0x%08lx\n", (long) pNode);
+	printf("pNODE: 0x%08lx %lu\n", (long) pNode, pNode->size);
 	printf("0x%08lx\n", (long) root);
 	memNode * prev = findMemorySpot(pNode);
 	addToFree(pNode, prev);
@@ -38,7 +38,7 @@ void combineSmallBlocks(memNode * p, memNode * prev) {
 	if (p->next) {
 		memNode * pNext = (memNode *) p->next;
 		if ((long) p + p->size + sizeof(memNode) - (long) pNext == 0) {
-			p->size = p->size + pNext->size + 2*sizeof(memNode);
+			p->size = p->size + pNext->size + sizeof(memNode);
 			if (pNext->next) {
 				p->next = pNext->next;
 			} else {
@@ -48,8 +48,8 @@ void combineSmallBlocks(memNode * p, memNode * prev) {
 		}
 	}
 	if (prev) {
-		if ((long) prev + prev->size+16 - (long) p == 0) {
-			prev->size = prev->size + p->size + 32;
+		if ((long) prev + prev->size+sizeof(memNode) - (long) p == 0) {
+			prev->size = prev->size + p->size + 2*sizeof(memNode);
 			if (p->next) {
 				prev->next = p->next;
 			} else {
