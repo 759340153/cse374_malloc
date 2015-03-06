@@ -37,6 +37,7 @@ void* getmem(uintptr_t size) {
     memNode * choosenBlock = chooseBlock(root, NULL, size);
     nFreeBlocks -= 1;
     totalFree -= choosenBlock-> size;
+	printf("CHOSEN: 0x%08lx\n", choosenBlock);
     return (void *) choosenBlock+sizeof(memNode); //should be start of data
 }
 
@@ -57,24 +58,26 @@ memNode * splitBlock(memNode * block, uintptr_t splitSize) {
 
 memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size) {
     if (block->size < size) {
-        if (block->size && block->next) {
+        if (block->next) {
+			printf("RECURSE\n");
            return chooseBlock((memNode *) block->next, block, size);
         }
         else {
             memNode * newBlock = mallocData((memNode *)block->next, size);
             block->next = (uintptr_t) newBlock; //link the new block
+			printf("NEW BLOCK RECURSE\n");
             return chooseBlock(newBlock, block ,size);
         }
     }
-    else if (root->size > maxOveragePercent*size) {
+    else if (block->size > maxOveragePercent*size) {
         splitBlock(block, size);
+		printf("SPLIT\n");
     }
     if (prevBlock) {
         prevBlock->next = block->next; //remove block from linked list
     }
     else {
-        root = (memNode *) block->next;
-		printf("moved root\n");
+        root = (memNode *) block->next; //block->next points to not free memory
     }
 	block->next = (uintptr_t) NULL;
     return block;
