@@ -66,7 +66,7 @@ memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size) {
             return chooseBlock(newBlock, block ,size);
         }
     }
-    else if (root->size > maxOveragePercent*size) {
+    else if (block->size > maxOveragePercent*size) {
         splitBlock(block, size);
     }
     if (prevBlock) {
