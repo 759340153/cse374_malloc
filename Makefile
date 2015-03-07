@@ -21,7 +21,7 @@ git:
 	git log > git.log
 	
 dist: 
-	tar cvf hw6-aa.tar *.c *.h Makefile git.log README
+	tar cvf hw6-aa.tar *.c *.h Makefile git.log README.txt
 	
 test:
 	make bench 
