@@ -22,8 +22,6 @@ void freemem(void * p) {
 		return;
 	} 
 	memNode* pNode = p - sizeof(memNode);
-	printf("pNODE: 0x%08lx %lu\n", (long) pNode, pNode->size);
-	printf("0x%08lx\n", (long) root);
 	memNode * prev = findMemorySpot(pNode);
 	addToFree(pNode, prev);
 	totalFree = totalFree + pNode->size + sizeof(memNode);
@@ -83,10 +81,8 @@ void addToFree(memNode * p, memNode * prev) {
 	if (!prev) {
 		if (root) {
 			uintptr_t temp = (uintptr_t) root;
-			printf("0x%08lx\n", (long) temp);
 			p->next = temp;
 			root = p;
-			printf("NOTE: 0x%08lx 0x%08lx \n", (long) root, (long) root->next);
 
 		} else {
 			root = p;
