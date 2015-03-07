@@ -82,7 +82,7 @@ memNode * findMemorySpot(memNode * p) {
 void addToFree(memNode * p, memNode * prev) {
 	if (!prev) {
 		if (root) {
-			uintptr_t temp = root;
+			uintptr_t temp = (uintptr_t) root;
 			printf("0x%08lx\n", (long) temp);
 			p->next = temp;
 			root = p;
