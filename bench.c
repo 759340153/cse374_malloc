@@ -73,7 +73,8 @@ int main(int argc, const char * argv[]) {
     pctlarge = pctlarge != -1 ? pctlarge : def_pctlarge;
     small_limit = small_limit != -1 ? small_limit : def_small_limit;
     large_limit = large_limit != -1 ? large_limit : def_large_limit;
-    random_seed = random_seed ? random_seed : getRandomSeed();
+    char data[randomSize];
+    random_seed = random_seed ? random_seed : getRandomSeed(data);
     uintptr_t *usedBlocks = (uintptr_t *) malloc(sizeof(uintptr_t)*ntrials);
     uintptr_t totalSize;
     uintptr_t totalFree;
@@ -82,7 +83,6 @@ int main(int argc, const char * argv[]) {
     srand(random_seed); //setup random seed
     for (int i = 0; i < ntrials; i++) {
         numberOfGottenBlocks = runRandomOp(usedBlocks, numberOfGottenBlocks);
-        printf("%d\n", i);
         if (ntrials > 10) {
             if (i % (ntrials/10) == 0) {
                 get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
@@ -101,13 +101,13 @@ int main(int argc, const char * argv[]) {
 /*
  Open up /dev/urandom and get an ints worth of random data from it.
  */
-int getRandomSeed() {
-    char data[randomSize];
+int getRandomSeed(char * data) {
     FILE *fp;
     fp = fopen("/dev/urandom", "r");
     fread(&data, 1, randomSize, fp);
     fclose(fp);
-    return (int) data;
+    printf("%d", (uint) data);
+    return (uint) data;
 }
 
 /*
@@ -115,7 +115,7 @@ int getRandomSeed() {
  */
 int runRandomOp(uintptr_t * usedBlocks, int numberOfGottenBlocks) {
     int ran = rand() % 100;
-    if (ran > pctget) {
+    if (ran >= pctget) {
         freeRandom(usedBlocks, numberOfGottenBlocks);
 		if(numberOfGottenBlocks > 0) {
 			return numberOfGottenBlocks - 1;
