@@ -30,7 +30,7 @@
 extern memNode * root;
 
 //function prototypes
-char * getRandomSeed(); //reads from /dev/urandom for size
+long getRandomSeed(char * data); //reads from /dev/urandom for size
 int runRandomOp(uintptr_t * usedBlocks, int numberOfGottenBlocks);
 void getRandom(uintptr_t *usedBlocks, int numberOfGottenBlocks);
 void freeRandom(uintptr_t * usedBlocks, int numberOfGottenBlocks);
@@ -42,7 +42,7 @@ int pctget = -1;
 int pctlarge = -1;
 int small_limit = -1;
 int large_limit = -1;
-int random_seed = 0;
+long random_seed = 0;
 
 /*
  Main program, which parses arguments passed in by the user and
@@ -73,14 +73,14 @@ int main(int argc, const char * argv[]) {
     pctlarge = pctlarge != -1 ? pctlarge : def_pctlarge;
     small_limit = small_limit != -1 ? small_limit : def_small_limit;
     large_limit = large_limit != -1 ? large_limit : def_large_limit;
-    int data[randomSize];
-    random_seed = random_seed ? random_seed : (int) getRandomSeed(data);
+    char data[randomSize];
+    random_seed = random_seed ? random_seed : getRandomSeed(data);
     uintptr_t *usedBlocks = (uintptr_t *) malloc(sizeof(uintptr_t)*ntrials);
     uintptr_t totalSize;
     uintptr_t totalFree;
     uintptr_t nFreeBlocks;
     int numberOfGottenBlocks = 0;
-    srand(random_seed); //setup random seed
+    srand((int)random_seed); //setup random seed (loses precision)
     for (int i = 0; i < ntrials; i++) {
         numberOfGottenBlocks = runRandomOp(usedBlocks, numberOfGottenBlocks);
         if (ntrials > 10) {
@@ -101,13 +101,13 @@ int main(int argc, const char * argv[]) {
 /*
  Open up /dev/urandom and get an ints worth of random data from it.
  */
-char * getRandomSeed(char * data) {
+long getRandomSeed(char * data) {
     FILE *fp;
     fp = fopen("/dev/urandom", "r");
     fread(&data, 1, randomSize, fp);
     fclose(fp);
     printf("%d", (int) data);
-    return data;
+    return (long) data;
 }
 
 /*
