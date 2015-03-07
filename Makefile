@@ -20,9 +20,8 @@ clean:
 git:
 	git log > git.log
 	
-dist: 
+dist: git 
 	tar cvf hw6-aa.tar *.c *.h Makefile git.log README.txt
 	
-test:
-	make bench 
+test: bench
 	./bench
