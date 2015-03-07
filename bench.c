@@ -106,8 +106,8 @@ int getRandomSeed(char * data) {
     fp = fopen("/dev/urandom", "r");
     fread(&data, 1, randomSize, fp);
     fclose(fp);
-    printf("%d", (uint) data);
-    return (uint) data;
+    printf("%d", (int) data);
+    return (int) data;
 }
 
 /*
