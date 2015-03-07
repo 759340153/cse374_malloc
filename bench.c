@@ -164,8 +164,14 @@ void printData(uintptr_t totalSize, uintptr_t totalFree, uintptr_t nFreeBlocks,
                clock_t startTime) {
     //totalFree/nFreeBlocks loses the decimal, but cleans up the output.
     double dur = 1000.0*(clock()-startTime)/CLOCKS_PER_SEC;
-    printf("Time: %.2f ms \n\tTotal Size: %lu, Free Blocks:"\
-           "%lu, Average Bytes Stored: %lu \n", dur,
-           totalSize, nFreeBlocks, totalFree/nFreeBlocks);
-    
+    if (nFreeBlocks) {
+        printf("Time: %.2f ms \n\tTotal Size: %lu, Free Blocks:"\
+               "%lu, Average Bytes Stored: %lu \n", dur,
+               totalSize, nFreeBlocks, totalFree/nFreeBlocks);
+    }
+    else {
+        printf("Time: %.2f ms \n\tTotal Size: %lu, Free Blocks:"\
+               "%lu, Average Bytes Stored: NA \n", dur,
+               totalSize, nFreeBlocks);
+    }
 }
