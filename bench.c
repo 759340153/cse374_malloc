@@ -30,7 +30,7 @@
 extern memNode * root;
 
 //function prototypes
-int getRandomSeed(); //reads from /dev/urandom for size
+char * getRandomSeed(); //reads from /dev/urandom for size
 int runRandomOp(uintptr_t * usedBlocks, int numberOfGottenBlocks);
 void getRandom(uintptr_t *usedBlocks, int numberOfGottenBlocks);
 void freeRandom(uintptr_t * usedBlocks, int numberOfGottenBlocks);
@@ -73,8 +73,8 @@ int main(int argc, const char * argv[]) {
     pctlarge = pctlarge != -1 ? pctlarge : def_pctlarge;
     small_limit = small_limit != -1 ? small_limit : def_small_limit;
     large_limit = large_limit != -1 ? large_limit : def_large_limit;
-    char data[randomSize];
-    random_seed = random_seed ? random_seed : getRandomSeed(data);
+    int data[randomSize];
+    random_seed = random_seed ? random_seed : (int) getRandomSeed(data);
     uintptr_t *usedBlocks = (uintptr_t *) malloc(sizeof(uintptr_t)*ntrials);
     uintptr_t totalSize;
     uintptr_t totalFree;
@@ -101,13 +101,13 @@ int main(int argc, const char * argv[]) {
 /*
  Open up /dev/urandom and get an ints worth of random data from it.
  */
-int getRandomSeed(char * data) {
+char * getRandomSeed(char * data) {
     FILE *fp;
     fp = fopen("/dev/urandom", "r");
     fread(&data, 1, randomSize, fp);
     fclose(fp);
     printf("%d", (int) data);
-    return (int) data;
+    return data;
 }
 
 /*
