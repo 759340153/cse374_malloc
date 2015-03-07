@@ -34,16 +34,15 @@ int getRandomSeed(); //reads from /dev/urandom for size
 int runRandomOp(uintptr_t * usedBlocks, int numberOfGottenBlocks);
 void getRandom(uintptr_t *usedBlocks, int numberOfGottenBlocks);
 void freeRandom(uintptr_t * usedBlocks, int numberOfGottenBlocks);
-void printArray(uintptr_t * usedBlocks, uintptr_t * nFreeBlocks);
+void printData(uintptr_t totalSize, uintptr_t totalFree, uintptr_t nFreeBlocks);
 
 //Command line argument globals
 int ntrials = 0;
-int pctget = 0;
-int pctlarge = 0;
-int small_limit = 0;
-int large_limit = 0;
+int pctget = -1;
+int pctlarge = -1;
+int small_limit = -1;
+int large_limit = -1;
 int random_seed = 0;
-int numberOfGottenBlocks = 0;
 
 /*
  Main program, which parses arguments passed in by the user and
@@ -67,21 +66,34 @@ int main(int argc, const char * argv[]) {
         case 2:
             ntrials = atoi(argv[1]);
     }
+    printf("%d\n", argc);
     //set the arguments to default if they are not currently set.
     ntrials = ntrials ? ntrials : def_ntrial;
-    pctget = pctget ? pctget : def_pctget;
-    pctlarge = pctlarge ? pctlarge : def_pctlarge;
-    small_limit = small_limit ? small_limit : def_small_limit;
-    large_limit = large_limit ? large_limit : def_large_limit;
+    pctget = pctget != -1 ? pctget : def_pctget;
+    pctlarge = pctlarge != -1 ? pctlarge : def_pctlarge;
+    small_limit = small_limit != -1 ? small_limit : def_small_limit;
+    large_limit = large_limit != -1 ? large_limit : def_large_limit;
     random_seed = random_seed ? random_seed : getRandomSeed();
     uintptr_t *usedBlocks = (uintptr_t *) malloc(sizeof(uintptr_t)*ntrials);
     uintptr_t totalSize;
     uintptr_t totalFree;
     uintptr_t nFreeBlocks;
+    int numberOfGottenBlocks = 0;
     srand(random_seed); //setup random seed
     for (int i = 0; i < ntrials; i++) {
         numberOfGottenBlocks = runRandomOp(usedBlocks, numberOfGottenBlocks);
-		get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
+        printf("%d\n", i);
+        if (ntrials > 10) {
+            if (i % (ntrials/10) == 0) {
+                get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
+                printData(totalSize, totalFree, nFreeBlocks);
+            }
+        }
+        //if ntrials is less than 10, print out the stats per run
+        else {
+            get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
+            printData(totalSize, totalFree, nFreeBlocks);
+        }
     }
     return 0;
 }
@@ -102,7 +114,8 @@ int getRandomSeed() {
  Run a random operation, either free or get mem.
  */
 int runRandomOp(uintptr_t * usedBlocks, int numberOfGottenBlocks) {
-    if (rand() % 100 > pctget) {
+    int ran = rand() % 100;
+    if (ran > pctget) {
         freeRandom(usedBlocks, numberOfGottenBlocks);
 		if(numberOfGottenBlocks > 0) {
 			return numberOfGottenBlocks - 1;
@@ -141,4 +154,13 @@ void freeRandom(uintptr_t * usedBlocks, int numberOfGottenBlocks) {
         freemem((void *)usedBlocks[index]);
         usedBlocks[index] = nodeAtlastIndex;
     }
+}
+
+/*
+ Prints information to stdout
+ */
+void printData(uintptr_t totalSize, uintptr_t totalFree, uintptr_t nFreeBlocks){
+    printf("Total size: %lu, total free: %lu, free blocks: %lu\n",
+           totalSize, totalFree, nFreeBlocks);
+    
 }

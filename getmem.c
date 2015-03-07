@@ -104,7 +104,6 @@ memNode * chooseBlock(memNode * block, memNode * prevBlock, uintptr_t size) {
     }
     else if (block->size > size + maxOveragePercent*size && block->size > size + (16 - size % 16) + 16) {
         block = splitBlock(block, size);
-		print_heap(stdout);
     }
     removeBlock(block, prevBlock);
 	block->next = (uintptr_t) NULL;
