@@ -1,9 +1,11 @@
 //
 //  mem_impl.h
+//
+// Internal implementation of the memNode structure.
+//
 //  hw6
 //
-//  Created by Max Golub on 2/25/15.
-//  Copyright (c) 2015 Max Golub. All rights reserved.
+//  Created by Max Golub and Alex Gingras on 2/25/15.
 //
 #include <inttypes.h>
 #ifndef hw6_mem_impl_h
