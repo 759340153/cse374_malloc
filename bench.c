@@ -36,7 +36,7 @@ int runRandomOp(uintptr_t * usedBlocks, int numberOfGottenBlocks);
 void getRandom(uintptr_t *usedBlocks, int numberOfGottenBlocks);
 void freeRandom(uintptr_t * usedBlocks, int numberOfGottenBlocks);
 void printData(uintptr_t totalSize, uintptr_t totalFree, uintptr_t nFreeBlocks,
-               clock_t startTime);
+               clock_t startTime, float percentage);
 
 //Command line argument globals
 int ntrials = 0;
@@ -83,20 +83,29 @@ int main(int argc, const char * argv[]) {
     int numberOfGottenBlocks = 0;
     clock_t startTime = clock();
     srand((int)random_seed); //setup random seed (loses precision)
+    if (ntrials < 10) {
+        printf("Percentages will be incorrect! \n");
+    }
     for (int i = 0; i < ntrials; i++) {
         numberOfGottenBlocks = runRandomOp(usedBlocks, numberOfGottenBlocks);
         if (ntrials > 10) {
-            if (i % (ntrials/10) == 0) {
+            int percent = i % (ntrials/10);
+            if (percent == 0 && i != 0) {
                 get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
-                printData(totalSize, totalFree, nFreeBlocks, startTime);
+                printData(totalSize, totalFree, nFreeBlocks, startTime,
+                          (float)(i)/(float)ntrials*100);
             }
         }
         //if ntrials is less than 10, print out the stats per run
         else {
             get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
-            printData(totalSize, totalFree, nFreeBlocks, startTime);
+            //Doesn't print exactley the right percentage, but
+            printData(totalSize, totalFree, nFreeBlocks, startTime,
+                      (float)i/(float) ntrials*100);
         }
     }
+    get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
+    printData(totalSize, totalFree, nFreeBlocks, startTime, 100);
     return 0;
 }
 
@@ -161,17 +170,17 @@ void freeRandom(uintptr_t * usedBlocks, int numberOfGottenBlocks) {
  Prints information to stdout
  */
 void printData(uintptr_t totalSize, uintptr_t totalFree, uintptr_t nFreeBlocks,
-               clock_t startTime) {
+               clock_t startTime, float percentage) {
     //totalFree/nFreeBlocks loses the decimal, but cleans up the output.
     double dur = 1000.0*(clock()-startTime)/CLOCKS_PER_SEC;
     if (nFreeBlocks) {
-        printf("Time: %.2f ms \n\tTotal Size: %lu, Free Blocks:"\
-               "%lu, Average Bytes Stored: %lu \n", dur,
+        printf("%.2f%% Time=%.2f ms: Total Size=%lu, Free Blocks="\
+               "%lu, Avg Bytes Stored=%lu \n", percentage, dur,
                totalSize, nFreeBlocks, totalFree/nFreeBlocks);
     }
     else {
-        printf("Time: %.2f ms \n\tTotal Size: %lu, Free Blocks:"\
-               "%lu, Average Bytes Stored: NA \n", dur,
+        printf("%.2f%% Time=%.2f ms: Total Size=%lu, Free Blocks="\
+               "%lu, Avg Bytes Stored=NA \n", percentage, dur,
                totalSize, nFreeBlocks);
     }
 }
