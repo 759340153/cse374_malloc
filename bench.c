@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "mem.h"
 
 //small and large block limits
@@ -34,7 +35,8 @@ long getRandomSeed(char * data); //reads from /dev/urandom for size
 int runRandomOp(uintptr_t * usedBlocks, int numberOfGottenBlocks);
 void getRandom(uintptr_t *usedBlocks, int numberOfGottenBlocks);
 void freeRandom(uintptr_t * usedBlocks, int numberOfGottenBlocks);
-void printData(uintptr_t totalSize, uintptr_t totalFree, uintptr_t nFreeBlocks);
+void printData(uintptr_t totalSize, uintptr_t totalFree, uintptr_t nFreeBlocks,
+               clock_t startTime);
 
 //Command line argument globals
 int ntrials = 0;
@@ -66,7 +68,6 @@ int main(int argc, const char * argv[]) {
         case 2:
             ntrials = atoi(argv[1]);
     }
-    printf("%d\n", argc);
     //set the arguments to default if they are not currently set.
     ntrials = ntrials ? ntrials : def_ntrial;
     pctget = pctget != -1 ? pctget : def_pctget;
@@ -80,19 +81,20 @@ int main(int argc, const char * argv[]) {
     uintptr_t totalFree;
     uintptr_t nFreeBlocks;
     int numberOfGottenBlocks = 0;
+    clock_t startTime = clock();
     srand((int)random_seed); //setup random seed (loses precision)
     for (int i = 0; i < ntrials; i++) {
         numberOfGottenBlocks = runRandomOp(usedBlocks, numberOfGottenBlocks);
         if (ntrials > 10) {
             if (i % (ntrials/10) == 0) {
                 get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
-                printData(totalSize, totalFree, nFreeBlocks);
+                printData(totalSize, totalFree, nFreeBlocks, startTime);
             }
         }
         //if ntrials is less than 10, print out the stats per run
         else {
             get_mem_stats(&totalSize, &totalFree, &nFreeBlocks);
-            printData(totalSize, totalFree, nFreeBlocks);
+            printData(totalSize, totalFree, nFreeBlocks, startTime);
         }
     }
     return 0;
@@ -106,7 +108,6 @@ long getRandomSeed(char * data) {
     fp = fopen("/dev/urandom", "r");
     fread(&data, 1, randomSize, fp);
     fclose(fp);
-    printf("%d", (int) data);
     return (long) data;
 }
 
@@ -159,8 +160,12 @@ void freeRandom(uintptr_t * usedBlocks, int numberOfGottenBlocks) {
 /*
  Prints information to stdout
  */
-void printData(uintptr_t totalSize, uintptr_t totalFree, uintptr_t nFreeBlocks){
-    printf("Total size: %lu, total free: %lu, free blocks: %lu\n",
-           totalSize, totalFree, nFreeBlocks);
+void printData(uintptr_t totalSize, uintptr_t totalFree, uintptr_t nFreeBlocks,
+               clock_t startTime) {
+    //totalFree/nFreeBlocks loses the decimal, but cleans up the output.
+    double dur = 1000.0*(clock()-startTime)/CLOCKS_PER_SEC;
+    printf("Time: %.2f ms \n\tTotal Size: %lu, Free Blocks:"\
+           "%lu, Average Bytes Stored: %lu \n", dur,
+           totalSize, nFreeBlocks, totalFree/nFreeBlocks);
     
 }
